@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"encoding/json"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
@@ -13,12 +14,6 @@ var (
 	activeSessions map[int]*sessions.Session
 	mutex          sync.Mutex
 )
-
-type Message struct {
-	Author     int
-	Text       string
-	Connection *websocket.Conn
-}
 
 func CreateRouting(app *fiber.App) {
 	activeSessions = map[int]*sessions.Session{}
@@ -46,13 +41,17 @@ func connectToDocumentHandler(conn *websocket.Conn) {
 	defer func() { session.Disconnect <- conn }()
 
 	for {
-		messageType, message, err := conn.ReadMessage()
+		messageType, jsonMessage, err := conn.ReadMessage()
 		if err != nil {
 			log.Fatal(err)
 		}
-
+		message := sessions.Message{}
+		err = json.Unmarshal(jsonMessage, &message)
+		if err != nil {
+			log.Fatal(err)
+		}
 		if messageType == websocket.TextMessage {
-			session.Broadcast <- string(message)
+			session.Broadcast <- message
 		} else {
 			log.Fatal("unexpected type of message")
 		}
