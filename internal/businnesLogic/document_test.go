@@ -103,5 +103,4 @@ func TestDocument_PullData(t *testing.T) {
 			t.Fail()
 		}
 	}
-
 }

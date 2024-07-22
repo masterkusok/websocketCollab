@@ -25,26 +25,51 @@ func CreateDocument() *Document {
 }
 
 func (d *Document) Insert(position float32, value byte) {
-	for i := 1; i < len(d.data); i++ {
-		if position < d.data[i].position && position > d.data[i-1].position {
-			newData := append([]liter{}, d.data[:i]...)
-			newData = append(newData, liter{position, value, false})
-			newData = append(newData, d.data[i:]...)
-			d.data = newData
-			d.Text = d.Text[:i-1] + string(value) + d.Text[i-1:]
-			return
+	if len(d.data) == 2 {
+		d.insertAt(liter{position: position, value: value, isSpecialChar: false}, 1)
+		return
+	}
+
+	l, r, m := 0, len(d.data)-1, 0
+
+	for l <= r {
+		m = l + (r-l)/2
+		if d.data[m-1].position < position && d.data[m].position > position {
+			d.insertAt(liter{position: position, value: value, isSpecialChar: false}, m)
+		}
+
+		if d.data[m-1].position > position {
+			r = m - 1
+		} else {
+			l = m + 1
 		}
 	}
+}
+
+func (d *Document) insertAt(l liter, index int) {
+	newData := append([]liter{}, d.data[:index]...)
+	newData = append(newData, l)
+	newData = append(newData, d.data[index:]...)
+	d.data = newData
+	d.Text = d.Text[:index-1] + string(l.value) + d.Text[index-1:]
 }
 
 func (d *Document) Delete(position float32) {
 	if position == 0 || position == 1 {
 		return
 	}
-	for i := 0; i < len(d.data); i++ {
-		if d.data[i].position == position {
-			d.Text = d.Text[:i-1] + d.Text[i:]
-			d.data = append(d.data[:i], d.data[i+1:]...)
+	l, r, m := 0, len(d.data)-1, 0
+
+	for l <= r {
+		m = l + (r-l)/2
+		if d.data[m].position == position {
+			d.Text = d.Text[:m-1] + d.Text[m:]
+			d.data = append(d.data[:m], d.data[m+1:]...)
+		}
+		if d.data[m].position < position {
+			l = m + 1
+		} else {
+			r = m - 1
 		}
 	}
 }
