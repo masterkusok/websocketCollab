@@ -1,0 +1,29 @@
+services:
+  backend:
+    image: wscollab:latest
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      POSTGRES_USER: "backend"
+      POSTGRES_PASSWORD: "68768fvdfidiuyfi"
+      POSTGRES_DB: "backend"
+      SQL_HOST: "db"
+      SQL_PORT: "5432"
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    restart: "always"
+    image: postgres:13-bullseye
+    #    volumes:
+    #      - "/fsdf:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_USER: "backend"
+      POSTGRES_PASSWORD: "68768fvdfidiuyfi"
+      POSTGRES_DB: "backend"
+    healthcheck:
+      test: pg_isready -U backend
+      interval: 2s
+      timeout: 3s
+      retries: 40
