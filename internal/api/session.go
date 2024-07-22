@@ -69,9 +69,8 @@ func (s *Session) RunSession() {
 			case DELETE:
 				s.document.Delete(message.Position)
 			}
-			s.document.ParseText()
 			log.Printf("CLIENT, changed file\n")
-			log.Printf("CURRENT TEXT:\n%s\n", s.document.Text)
+			log.Printf("CURRENT TEXT:\n%s\n", s.document.GetText())
 			s.syncDoc()
 
 		case connection := <-s.Disconnect:
@@ -99,7 +98,7 @@ func (s *Session) RunSession() {
 
 func (s *Session) syncDoc() {
 	for conn := range s.activeConnections {
-		err := conn.WriteMessage(websocket.TextMessage, []byte(s.document.Text))
+		err := conn.WriteMessage(websocket.TextMessage, []byte(s.document.GetText()))
 		if err != nil {
 			log.Fatal(err)
 		}
