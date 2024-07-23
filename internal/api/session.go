@@ -30,14 +30,12 @@ type Session struct {
 	numberOfClients     int
 	repository          *businnesLogic.DocumentRepository
 	activeConnections   map[*websocket.Conn]*Client
-	documentId          uint
 	document            *businnesLogic.Document
 }
 
 func CreateSession(document *businnesLogic.Document, repository *businnesLogic.DocumentRepository, storage *SessionStorage) *Session {
 	return &Session{
-		Id:                1,
-		documentId:        document.ID,
+		Id:                int(document.ID),
 		numberOfClients:   0,
 		Connect:           make(chan *websocket.Conn),
 		Disconnect:        make(chan *websocket.Conn),
