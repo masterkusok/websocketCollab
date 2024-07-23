@@ -23,9 +23,9 @@ To run project in Docker:
 db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{Logger: logger.Default.LogMode(logger.Info)})
 ```
 
-3) Build image:
+2) Build image:
 `docker build . -t "wscollab:latest"`
-4) Run docker-compose:
+3) Run docker-compose:
 `docker-compose -f docker-compose.yaml up`
 
 ### Running project without Docker
